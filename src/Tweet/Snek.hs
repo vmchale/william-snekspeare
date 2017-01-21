@@ -19,7 +19,7 @@ exec' = snekspeare >>= prompt (flip snekTweet ".credws")
 
 prompt :: (TL.Text -> IO ()) -> TL.Text -> IO ()
 prompt f input = do
-    TLIO.putStrLn (input `TL.append` "\n\n   Proceed? (y/N)")
+    TLIO.putStr (input `TL.append` "\n\n   Proceed? (y/N)")
     c <- getChar
     case (toLower c) of
         'y' -> f input

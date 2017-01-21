@@ -1,2 +1,3 @@
 - [ ] update stack.yaml: clit to 0.2.3.3 and madlang to 1.0.2
 - [ ] have like "ssSs" in the madlang thingy
+- [ ] add colors to prompts
