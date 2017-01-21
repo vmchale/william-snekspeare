@@ -22,6 +22,7 @@ library
                      , mwc-random
                      , lens
                      , madlang
+                     , ansi-wl-pprint
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
 

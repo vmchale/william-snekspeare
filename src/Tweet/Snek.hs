@@ -10,6 +10,7 @@ import qualified Data.Text.Lazy.IO as TLIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text as T
 import Text.Madlibs
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 import System.Random.MWC
 import Web.Tweet
 
@@ -19,7 +20,7 @@ exec' = snekspeare >>= prompt (flip snekTweet ".credws")
 
 prompt :: (TL.Text -> IO ()) -> TL.Text -> IO ()
 prompt f input = do
-    TLIO.putStr (input `TL.append` "\n\n   Proceed? (y/N)")
+    putStrLn . show $ ((text . TL.unpack) input) <> yellow "\n\n   Proceed? (y/N)"
     c <- getChar
     case (toLower c) of
         'y' -> f input
