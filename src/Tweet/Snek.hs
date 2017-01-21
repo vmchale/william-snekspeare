@@ -5,6 +5,7 @@ module Tweet.Snek
 import Control.Applicative
 import Control.Lens
 import Control.Monad
+import Data.Char
 import qualified Data.Text.Lazy.IO as TLIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text as T
@@ -17,13 +18,13 @@ snekTweet txt = thread (TL.unpack txt) mempty Nothing tweets
     where tweets = fromIntegral $ (TL.length txt) `div` 140 + 1
 
 exec' :: IO ()
-exec' = snekspeare >>= TLIO.putStrLn
+exec' = snekspeare >>= TLIO.putStrLn --flip snekTweet ".credws"
 
 snekspeare :: IO TL.Text
-snekspeare = (sReplace <=< pickLine <=< (pure . sepLines)) =<< readSnekspeare
+snekspeare = ((pure . (`TL.append` "\n  -William Snakespeare")) <=< sReplace <=< pickLine <=< (pure . sepLines)) =<< readSnekspeare
 
 sReplace :: TL.Text -> IO TL.Text
-sReplace = (fmap (TL.pack . concat)) . (mapM (\c -> if c /= 's' then pure [c] else T.unpack <$> runFile "madsrc/slither.mad")) . TL.unpack
+sReplace = (fmap (TL.pack . concat)) . (mapM (\c -> if c /= 's' && c /= 'S' then pure [c] else ((:) c) . T.unpack <$> runFile "madsrc/slither.mad")) . TL.unpack
 
 pickLine :: [TL.Text] -> IO TL.Text
 pickLine lines = do
@@ -31,9 +32,10 @@ pickLine lines = do
     pure $ TL.dropWhile (==' ') $ TL.filter (\a -> and $ map (a/=) "[]\r\n") $ lines !! i
 
 sepLines :: TL.Text -> [TL.Text]
-sepLines = (fmap replacements) . (filter (/="")) . (TL.split splitWhen)
+sepLines = (fmap replacements) . filterLower . (filter (/="")) . (TL.split splitWhen)
     where splitWhen    = \a -> or $ map (a==) ".?!" 
           replacements = foldr ((.) . (flip TL.replace " ")) id (map (flip TL.replicate " ") [2..4])
+          filterLower  = (map TL.pack) . (filter (any isLower)) . (map TL.unpack)
 
 readSnekspeare :: IO TL.Text
 readSnekspeare = TLIO.readFile "text/complete-works.txt"
