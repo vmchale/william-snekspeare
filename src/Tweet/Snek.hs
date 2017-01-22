@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Lens
 import Control.Monad
 import Data.Char
+import Data.Maybe
 import qualified Data.Text.Lazy.IO as TLIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text as T
@@ -17,7 +18,8 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 import System.Random.MWC
 import Web.Tweet
 
-data Program = Program { noprompt :: Bool <?> "whether to proceed before tweeting (avoid shitposts)"
+data Program = Program { noprompt :: Bool           <?> "whether to proceed before tweeting (avoid shitposts)"
+                       , cred     :: Maybe FilePath <?> "filepath to credentials file"
                        } deriving (Generic)
 
 instance ParseRecord Program
@@ -26,10 +28,11 @@ instance ParseRecord Program
 exec' :: IO ()
 exec' = do
     x <- getRecord "William SnakeSpeare"
+    let file = (fromMaybe ".cred") . unHelpful . cred $ x
     if (unHelpful . noprompt) x then
-        snekspeare >>= flip snekTweet ".credws"
+        snekspeare >>= flip snekTweet file
     else
-        snekspeare >>= proceed (flip snekTweet ".credws")
+        snekspeare >>= proceed (flip snekTweet file)
 
 -- | Utility function to ask before tweeting
 proceed :: (TL.Text -> IO ()) -> TL.Text -> IO ()
