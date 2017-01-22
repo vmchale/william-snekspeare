@@ -1,7 +1,19 @@
-:return
+:define uppers
+    0.12 ""
+    0.31 "Ss"
+    0.39 "sSs"
+    0.1 "sSSs"
+    0.06 "SSs"
+    0.02 "SSSs"
+
+:define lowers
     0.11 ""
     0.32 "s"
     0.39 "ss"
     0.1 "sss"
     0.06 "ssss"
     0.02 "sssss"
+
+:return
+    0.75 lowers
+    0.25 uppers

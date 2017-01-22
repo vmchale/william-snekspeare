@@ -23,8 +23,11 @@ library
                      , lens
                      , madlang
                      , ansi-wl-pprint
+                     , optparse-generic
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
+                     , DeriveGeneric
+                     , DataKinds
 
 executable william-snekspeare
   hs-source-dirs:      app

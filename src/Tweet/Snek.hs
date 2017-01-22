@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeOperators #-}
+
 module Tweet.Snek
     ( exec'
     ) where
@@ -9,18 +11,28 @@ import Data.Char
 import qualified Data.Text.Lazy.IO as TLIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text as T
+import Options.Generic
 import Text.Madlibs
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 import System.Random.MWC
 import Web.Tweet
 
+data Program = Program { noPrompt :: Bool <?> "whether to prompt before tweeting (avoid shitposts)"
+                       } deriving (Generic)
+
+instance ParseRecord Program
+
 -- | main executable
 exec' :: IO ()
-exec' = snekspeare >>= prompt (flip snekTweet ".credws")
+exec' = do
+    x <- getRecord "William SnakeSpeare"
+    case (unHelpful . noprompt) x of
+        False -> snekspeare >>= prompt (flip snekTweet ".credws")
+        True -> snekspeare >>= flip snekTweet ".credws"
 
 prompt :: (TL.Text -> IO ()) -> TL.Text -> IO ()
 prompt f input = do
-    putStrLn . show $ ((text . TL.unpack) input) <> yellow "\n\n   Proceed? (y/N)"
+    print $ ((text . TL.unpack) input) <> yellow "\n\n   Proceed? (y/N)"
     c <- getChar
     case (toLower c) of
         'y' -> f input
