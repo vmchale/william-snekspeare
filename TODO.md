@@ -1,4 +1,5 @@
 - [x] update stack.yaml: clit to 0.2.3.3 and madlang to 1.0.2
 - [x] have like "ssSs" in the madlang thingy
 - [x] add colors to prompts
+- [x] optparse-generic
 - [ ] for optparse-generic to add color?

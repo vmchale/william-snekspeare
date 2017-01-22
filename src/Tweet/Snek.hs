@@ -17,7 +17,7 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 import System.Random.MWC
 import Web.Tweet
 
-data Program = Program { noPrompt :: Bool <?> "whether to prompt before tweeting (avoid shitposts)"
+data Program = Program { noprompt :: Bool <?> "whether to proceed before tweeting (avoid shitposts)"
                        } deriving (Generic)
 
 instance ParseRecord Program
@@ -26,12 +26,14 @@ instance ParseRecord Program
 exec' :: IO ()
 exec' = do
     x <- getRecord "William SnakeSpeare"
-    case (unHelpful . noprompt) x of
-        False -> snekspeare >>= prompt (flip snekTweet ".credws")
-        True -> snekspeare >>= flip snekTweet ".credws"
+    if (unHelpful . noprompt) x then
+        snekspeare >>= flip snekTweet ".credws"
+    else
+        snekspeare >>= proceed (flip snekTweet ".credws")
 
-prompt :: (TL.Text -> IO ()) -> TL.Text -> IO ()
-prompt f input = do
+-- | Utility function to ask before tweeting
+proceed :: (TL.Text -> IO ()) -> TL.Text -> IO ()
+proceed f input = do
     print $ ((text . TL.unpack) input) <> yellow "\n\n   Proceed? (y/N)"
     c <- getChar
     case (toLower c) of
