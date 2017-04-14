@@ -16,7 +16,7 @@ import Options.Generic
 import Text.Madlibs
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 import System.Random.MWC
-import Web.Tweet
+import Web.Tweet hiding (text)
 
 data Program = Program { noprompt :: Bool           <?> "whether to proceed before tweeting (avoid shitposts)"
                        , cred     :: Maybe FilePath <?> "filepath to credentials file"
@@ -28,7 +28,7 @@ instance ParseRecord Program
 exec' :: IO ()
 exec' = do
     x <- getRecord "William SnakeSpeare"
-    let file = (fromMaybe ".cred") . unHelpful . cred $ x
+    let file = (fromMaybe ".credws") . unHelpful . cred $ x
     if (unHelpful . noprompt) x then
         snekspeare >>= flip snekTweet file
     else
@@ -37,7 +37,7 @@ exec' = do
 -- | Utility function to ask before tweeting
 proceed :: (TL.Text -> IO ()) -> TL.Text -> IO ()
 proceed f input = do
-    print $ ((text . TL.unpack) input) <> yellow "\n\n   Proceed? (y/N)"
+    print $ ((text . TL.unpack) input) <> dullyellow "\n\n   Proceed? (y/N)"
     c <- getChar
     case (toLower c) of
         'y' -> f input
@@ -54,7 +54,7 @@ snekspeare = ((pure . (`TL.append` "\n  -William Snakespeare")) <=< sReplace <=<
 
 -- | replace every s with a random number of them
 sReplace :: TL.Text -> IO TL.Text
-sReplace = (fmap (TL.pack . concat)) . (mapM (\c -> if c /= 's' && c /= 'S' then pure [c] else ((:) c) . T.unpack <$> runFile "madsrc/slither.mad")) . TL.unpack
+sReplace = (fmap (TL.pack . concat)) . (mapM (\c -> if c /= 's' && c /= 'S' then pure [c] else ((:) c) . T.unpack <$> runFile [] "madsrc/slither.mad")) . TL.unpack
 
 -- | pick which line of shakespeare we want today
 pickLine :: [TL.Text] -> IO TL.Text
